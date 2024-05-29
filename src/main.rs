@@ -1,4 +1,4 @@
-use axum::response::IntoResponse;
+use axum::response::{Html, IntoResponse};
 use axum::Json;
 use axum::{extract::State, routing::get, Router};
 use sysinfo::System;
@@ -33,7 +33,7 @@ async fn cpus_get(State(state): State<AppState>) -> impl IntoResponse{
     Json(v)
 }
 
-async fn root_get(State(state): State<AppState>) -> &'static str{
-
-    "Hello world..!"
+async fn root_get(State(state): State<AppState>) -> impl IntoResponse{
+    let html = tokio::fs::read_to_string("src/index.html").await.unwrap();
+    Html(html)
 }
