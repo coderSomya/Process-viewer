@@ -6,6 +6,7 @@ async fn main() {
 
     let router = Router::new()
     .route("/", get(root_get))
+    .route("/api/cpus", get(cpus_get))
     .with_state(AppState {
         sys: Arc::new(Mutex::new(System::new())),
     });
@@ -20,7 +21,7 @@ struct AppState {
     sys: Arc<Mutex<System>>
 }
 
-async fn root_get(State(state): State<AppState>) -> String{
+async fn cpus_get(State(state): State<AppState>) -> String{
     use std::fmt::Write;
 
 
@@ -38,3 +39,7 @@ async fn root_get(State(state): State<AppState>) -> String{
     s
 }
 
+async fn root_get(State(state): State<AppState>) -> &'static str{
+    
+    "Hello world..!"
+}
