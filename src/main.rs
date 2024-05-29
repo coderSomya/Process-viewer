@@ -1,3 +1,5 @@
+use axum::response::IntoResponse;
+use axum::Json;
 use axum::{extract::State, routing::get, Router};
 use sysinfo::System;
 use std::sync::Mutex;use std::sync::Arc;
@@ -21,25 +23,17 @@ struct AppState {
     sys: Arc<Mutex<System>>
 }
 
-async fn cpus_get(State(state): State<AppState>) -> String{
-    use std::fmt::Write;
+async fn cpus_get(State(state): State<AppState>) -> impl IntoResponse{
 
-
-    let mut s = String::new();
     let mut sys = state.sys.lock().unwrap();
     sys.refresh_cpu();
 
-    for (i, cpu) in sys.cpus().iter().enumerate() {
-        let i = i+1;
-        let usage = cpu.cpu_usage();
+    let v: Vec<_> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
 
-        writeln!(&mut s, "CPU {i} {usage}%");
-    }
-
-    s
+    Json(v)
 }
 
 async fn root_get(State(state): State<AppState>) -> &'static str{
-    
+
     "Hello world..!"
 }
