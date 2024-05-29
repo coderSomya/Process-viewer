@@ -11,6 +11,7 @@ async fn main() {
     .route("/", get(root_get))
     .route("/api/cpus", get(cpus_get))
     .route("/index.mjs", get(indexmjs_get))
+    .route("/index.css", get(indexcss_get))
     .with_state(AppState {
         sys: Arc::new(Mutex::new(System::new())),
     });
@@ -46,5 +47,14 @@ async fn indexmjs_get(State(state): State<AppState>) -> impl IntoResponse{
 
     Response::builder().header("content-type", "application/javascript;charset=utf-8")
     .body(js)
+    .unwrap()
+}
+
+async fn indexcss_get(State(state): State<AppState>) -> impl IntoResponse{
+
+    let css = tokio::fs::read_to_string("src/index.css").await.unwrap();
+
+    Response::builder().header("content-type", "text/css;charset=utf-8")
+    .body(css)
     .unwrap()
 }
